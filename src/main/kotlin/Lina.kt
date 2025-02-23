@@ -4,7 +4,7 @@ import org.nd4j.linalg.factory.Nd4j
 import org.nd4j.linalg.indexing.NDArrayIndex
 
 class Lina {
-	companion object{
+	companion object {
 		// ベクトルaとbに対し、和c = a + bを計算
 		/**
 		 * Calculates the sum of two vectors a and b.
@@ -77,7 +77,7 @@ class Lina {
 		 * @param b Second matrix
 		 * @return Resultant matrix C = A * B
 		 */
-		fun mulMatMat(a: Array<FloatArray>, b: Array<FloatArray>): Array<FloatArray>{
+		fun mulMatMat(a: Array<FloatArray>, b: Array<FloatArray>): Array<FloatArray> {
 			val m1 = Nd4j.create(a)
 			val m2 = Nd4j.create(b)
 			val m3 = m1.mmul(m2)
@@ -104,7 +104,7 @@ class Lina {
 		 * @param k Scalar value
 		 * @return Resultant matrix C = k * A
 		 */
-		fun mulScaMat(a: Array<FloatArray>, k: Float): Array<FloatArray>{
+		fun mulScaMat(a: Array<FloatArray>, k: Float): Array<FloatArray> {
 			return Nd4j.create(a).mul(k).toFloatMatrix()
 		}
 
@@ -115,7 +115,7 @@ class Lina {
 		 * @param b Scalar value
 		 * @return Resultant vector c = k * a
 		 */
-		fun mulScaVec(a: FloatArray, b: Float): FloatArray{
+		fun mulScaVec(a: FloatArray, b: Float): FloatArray {
 			return Nd4j.create(a).mul(b).toFloatVector()
 		}
 
@@ -125,7 +125,7 @@ class Lina {
 		 * @param a Matrix A
 		 * @return Transposed matrix C = A^t
 		 */
-		fun tMat(a: Array<FloatArray>): Array<FloatArray>{
+		fun tMat(a: Array<FloatArray>): Array<FloatArray> {
 			return Nd4j.create(a).transpose().toFloatMatrix()
 		}
 
@@ -135,7 +135,7 @@ class Lina {
 		 * @param a Matrix A
 		 * @return Inverse matrix C = A^{-1}
 		 */
-		fun invMat(a: Array<FloatArray>): Array<FloatArray>{
+		fun invMat(a: Array<FloatArray>): Array<FloatArray> {
 			return Nd4j.linalg.matrixInverse(Nd4j.create(a)).toFloatMatrix()
 		}
 
@@ -146,7 +146,7 @@ class Lina {
 		 * @param b Constant vector b
 		 * @return Solution vector x
 		 */
-		fun solveSeq(a: Array<FloatArray>, b: FloatArray): FloatArray{
+		fun solveSeq(a: Array<FloatArray>, b: FloatArray): FloatArray {
 			val ma = Nd4j.create(a)
 			val mb = Nd4j.create(vectorToMatrix(b))
 			return Nd4j.linalg.solve(ma, mb).toFloatVector()
@@ -159,7 +159,7 @@ class Lina {
 		 * @param a Symmetric matrix A
 		 * @return A Pair containing eigenvalues sorted in descending order and corresponding normalized eigenvectors
 		 */
-		fun symEigen(a: Array<FloatArray>): Pair<FloatArray, Array<FloatArray>>{
+		fun symEigen(a: Array<FloatArray>): Pair<FloatArray, Array<FloatArray>> {
 			val eig = Nd4j.linalg.eig(Nd4j.create(a))
 
 			val lambda = eig[0].get(NDArrayIndex.all(), NDArrayIndex.point(0)).toFloatVector()
@@ -175,7 +175,7 @@ class Lina {
 		 * @param a Positive definite matrix A
 		 * @return Upper triangular matrix U such that A = U^t * U
 		 */
-		fun chDecomp(a: Array<FloatArray>): Array<FloatArray>{
+		fun chDecomp(a: Array<FloatArray>): Array<FloatArray> {
 			val ma = Nd4j.create(a)
 			return Nd4j.linalg.cholesky(ma).toFloatMatrix()
 		}
@@ -186,7 +186,7 @@ class Lina {
 		 * @param a Matrix A
 		 * @return Determinant of A
 		 */
-		fun detMat(a: Array<FloatArray>): Float{
+		fun detMat(a: Array<FloatArray>): Float {
 			return Nd4j.linalg.matrixDeterminant(Nd4j.create(a)).getFloat(0)
 		}
 
@@ -207,9 +207,10 @@ class Lina {
 		 * @param a Matrix A
 		 * @return A Pair containing U, SIGMA, and V^t from the SVD
 		 */
-		fun svdMat(a: Array<FloatArray>): Pair<FloatArray, Pair<Array<FloatArray>, Array<FloatArray>>>{
+		fun svdMat(a: Array<FloatArray>): Pair<FloatArray, Pair<Array<FloatArray>, Array<FloatArray>>> {
 			val ma = Nd4j.create(a)
-			val act = DynamicCustomOp.builder("svd").addInputs(ma).addIntegerArguments(1, 1, Svd.DEFAULT_SWITCHNUM).build()
+			val act =
+				DynamicCustomOp.builder("svd").addInputs(ma).addIntegerArguments(1, 1, Svd.DEFAULT_SWITCHNUM).build()
 			val svd = Nd4j.getExecutioner().exec(act)
 
 			val u = svd[0].toFloatVector()
@@ -227,15 +228,15 @@ class Lina {
 		 * @param a Symmetric matrix A
 		 * @return A Pair containing sorted eigenvalues and corresponding normalized eigenvectors
 		 */
-		fun svdSymEigen(a: Array<FloatArray>): Pair<FloatArray, Array<FloatArray>>{
+		fun svdSymEigen(a: Array<FloatArray>): Pair<FloatArray, Array<FloatArray>> {
 			val (lambda, pair) = svdMat(a)
 			val (s, vector) = pair
 
-			for (i in 0 until vector[0].size){
+			for (i in 0 until vector[0].size) {
 				val ip = ipVecVec(matrixToVector(s, i), matrixToVector(vector, i))
-				if (ip < 0f){
+				if (ip < 0f) {
 					lambda[i] *= -1f
-					for (j in 0 until vector.size){
+					for (j in 0 until vector.size) {
 						vector[j][i] *= -1f
 					}
 				}
@@ -250,10 +251,10 @@ class Lina {
 		 * @param v Vector to be converted
 		 * @return Matrix representation of the vector
 		 */
-		fun vectorToMatrix(v: FloatArray): Array<FloatArray>{
+		fun vectorToMatrix(v: FloatArray): Array<FloatArray> {
 			val ans: Array<FloatArray> = Array(v.size) { FloatArray(1) }
 
-			for (i in 0 until v.size){
+			for (i in 0 until v.size) {
 				ans[i][0] = v[i]
 			}
 
@@ -267,10 +268,10 @@ class Lina {
 		 * @param n Column index to be converted
 		 * @return Vector representation of the specified column
 		 */
-		fun matrixToVector(m: Array<FloatArray>, n: Int): FloatArray{
+		fun matrixToVector(m: Array<FloatArray>, n: Int): FloatArray {
 			val ans = FloatArray(m.size)
 
-			for (i in 0 until m.size){
+			for (i in 0 until m.size) {
 				ans[i] = m[i][n]
 			}
 
@@ -306,7 +307,7 @@ class Lina {
 
 			val fmt: String = "%" + strSize + "f"
 			var spc = ""
-			for (i in  0 until str.length){
+			for (i in 0 until str.length) {
 				spc += " "
 			}
 
@@ -329,7 +330,7 @@ class Lina {
 		 * Prints a vector without a label.
 		 * @param vec Vector to be printed
 		 */
-		fun printVec(vec: FloatArray){
+		fun printVec(vec: FloatArray) {
 			printVec("", vec)
 		}
 
@@ -338,7 +339,7 @@ class Lina {
 		 * Prints a matrix without a label.
 		 * @param matrix Matrix to be printed
 		 */
-		fun printMat(matrix: Array<FloatArray>){
+		fun printMat(matrix: Array<FloatArray>) {
 			printMat("", matrix)
 		}
 
